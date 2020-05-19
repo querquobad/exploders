@@ -30,6 +30,11 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 				}
 			}
 		}
+		/*
+		 * Status 2 = In progress
+		 * Status 3 = Game Over
+		 */
+		$this->status = 2;
 	}
 
 	public function jsonSerialize() {
@@ -48,16 +53,25 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 			throw new CellNotOwnedException('Esa celda pertenece al jugador '.$owner);
 		$this->cuenta[$jugador]++;
 		$cuarto->getBall($jugador);
-		echo $id."\n";
+		$retval = array();
 		while($count = $this->exploders->count()) {
 			for($i=0;$i<$count;$i++) {
 				$cuarto = $this->exploders->dequeue();
-				echo "\t".$cuarto->getId()."\n";
+				$retval[] = $cuarto->getId();
 				$change = $cuarto->explode();
 				foreach($change as $k => $v)
 					$this->cuenta[$k] += $v;
 			}
+			if(array_sum($this->cuenta) == $this->cuenta[$jugador]) {
+				$this->status = 3;
+				break;
+			}
 		}
+		return array(
+			'status' => $this->status,
+			'exploders' => $retval,
+			'scores' => $this->cuenta
+		);
 	}
 
 	private function recursive_room_search($id) {
