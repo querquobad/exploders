@@ -4,6 +4,7 @@ class ExploderCell extends ExploderObject implements JsonSerializable {
 	private $contenido;
 	private $mapa;
 	private $vecinos;
+	private $jugador;
 
 	public function __construct(ExploderMap $mapa = null) {
 		parent::__construct();
@@ -20,24 +21,43 @@ class ExploderCell extends ExploderObject implements JsonSerializable {
 		$this->mapa = $mapa;
 	}
 
-	public function getBall() {
+	public function getBall($jugador) {
+		$retval = array();
+		if(!is_null($this->jugador) && $jugador != $this->jugador) {
+			$retval[$this->jugador] = ($this->contenido * -1);
+			$retval[$jugador] = $this->contenido;
+		}
 		$this->contenido++;
+		$this->jugador = $jugador;
 		if($this->contenido == count($this->vecinos))
 			$this->mapa->queue($this);
+		return $retval;
 	}
 
 	public function explode() {
+		$retval = array();
 		foreach($this->vecinos as $vecino_actual) {
 			$this->contenido--;
-			$vecino_actual->getBall();
+			$change = $vecino_actual->getBall($this->jugador);
+			foreach($change as $k => $v) {
+				if(!isset($retval[$k]))
+					$retval[$k] = 0;
+				$retval[$k] += $v;
+			}
 		}
+		return $retval;
 	}
 
 	public function jsonSerialize() {
 		return array(
 			'id' => $this->getId(),
 			'contenido' => $this->contenido,
+			'jugador' => $this->jugador
 		);
+	}
+
+	public function getJugador() {
+		return $this->jugador;
 	}
 }
 

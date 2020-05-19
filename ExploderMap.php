@@ -3,6 +3,7 @@
 class ExploderMap extends ExploderObject implements JsonSerializable {
 	private $cuartos;
 	private $exploders;
+	private $cuenta = array();
 
 	public function __construct($ancho,$alto) {
 		parent::__construct();
@@ -39,11 +40,25 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 		);
 	}
 
-	public function pushBall($id) {
-		$this->recursive_room_search($id)->getBall();
-		while($count = $this->exploders->count())
-			for($i=0;$i<$count;$i++)
-				$this->exploders->dequeue()->explode();
+	public function pushBall($id, int $jugador) {
+		if(!isset($this->cuenta[$jugador]))
+			$this->cuenta[$jugador] = 0;
+		$cuarto = $this->recursive_room_search($id);
+		$owner = $cuarto->getJugador();
+		if(!is_null($owner) && $jugador != $owner)
+			throw new CellNotOwnedException('Esa celda pertenece al jugador '.$owner);
+		$this->cuenta[$jugador]++;
+		$cuarto->getBall($jugador);
+		echo $id."\n";
+		while($count = $this->exploders->count()) {
+			for($i=0;$i<$count;$i++) {
+				$cuarto = $this->exploders->dequeue();
+				echo "\t".$cuarto->getId()."\n";
+				$change = $cuarto->explode();
+				foreach($change as $k => $v)
+					$this->cuenta[$k] += $v;
+			}
+		}
 	}
 
 	private function recursive_room_search($id) {
