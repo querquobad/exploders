@@ -1,13 +1,12 @@
 <?php
 
 class ExploderMap extends ExploderObject implements JsonSerializable {
-	private $cuartos;
+	private $cuartos = array();
 	private $exploders;
 	private $cuenta = array();
 
 	public function __construct($ancho,$alto) {
 		parent::__construct();
-		$this->cuartos = array();
 		$this->exploders = new SplQueue();
 		foreach(array('crear','conectar') as $accion) {
 			for($h = 0;$h < $alto; $h++) {
@@ -71,7 +70,7 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 		throw new OutOfBoundsException('El cuarto no existe');
 	}
 
-	public function queue($cell) {
+	public function queue(ExploderCell $cell) {
 		$this->exploders->enqueue($cell);
 	}
 }
