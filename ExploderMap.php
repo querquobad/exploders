@@ -97,7 +97,7 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 
 	public function newPlayer(ExploderPlayer $player) {
 		if($this->status != 1)
-			throw new ExploderGameAlreadyStartedException('El juego ya comenzó');
+			throw new WrongGameStatusException('El juego ya comenzó');
 		$this->players[] = $player;
 	}
 
