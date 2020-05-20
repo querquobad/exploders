@@ -29,7 +29,7 @@ class ExploderCell extends ExploderObject implements JsonSerializable {
 		}
 		$this->contenido++;
 		$this->jugador = $jugador;
-		if($this->contenido == count($this->vecinos))
+		if($this->contenido == $this->vecinos->count())
 			$this->mapa->queue($this);
 		return $retval;
 	}
