@@ -31,10 +31,11 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 			}
 		}
 		/*
+		 * Status 1 = Starting
 		 * Status 2 = In progress
 		 * Status 3 = Game Over
 		 */
-		$this->status = 2;
+		$this->status = 1;
 	}
 
 	public function jsonSerialize() {
@@ -44,14 +45,14 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 		);
 	}
 
-	public function pushBall($id, int $jugador) {
-		if(!isset($this->cuenta[$jugador]))
-			$this->cuenta[$jugador] = 0;
+	public function pushBall($id, ExploderPlayer $jugador) {
+		if($jugador != $this->players[0])
+			throw new WrongExploderPlayerException('El turno le pertenece al jugador '.$this->players[0]->getId());
 		$cuarto = $this->recursive_room_search($id);
 		$owner = $cuarto->getJugador();
 		if(!is_null($owner) && $jugador != $owner)
-			throw new CellNotOwnedException('Esa celda pertenece al jugador '.$owner);
-		$this->cuenta[$jugador]++;
+			throw new CellNotOwnedException('Esa celda pertenece al jugador '.$owner->getId());
+		$jugador->score(1);
 		$cuarto->getBall($jugador);
 		$retval = array();
 		while($count = $this->exploders->count()) {
@@ -60,21 +61,23 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 				$retval[] = $cuarto->getId();
 				$change = $cuarto->explode();
 				foreach($change as $k => $v)
-					$this->cuenta[$k] += $v;
+					$this->getPlayer($k)->score($v);
 			}
-			if(array_sum($this->cuenta) == $this->cuenta[$jugador]) {
-				$this->status = 3;
+			$this->validaGanador();
+			if($this->status == 3)
 				break;
-			}
 		}
+		do {
+			array_push($this->players,array_shift($this->players));
+		} while ($this->players[0]->score === 0);
 		return array(
 			'status' => $this->status,
 			'play' => array(
-				'player' => $jugador,
+				'player' => $jugador->getId(),
 				'cell' => $id
 			),
 			'exploders' => $retval,
-			'scores' => $this->cuenta
+			'scores' => array_column($this->players,'score','id')
 		);
 	}
 
@@ -90,6 +93,23 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 
 	public function queue(ExploderCell $cell) {
 		$this->exploders->enqueue($cell);
+	}
+
+	public function newPlayer(ExploderPlayer $player) {
+		if($this->status != 1)
+			throw new ExploderGameAlreadyStartedException('El juego ya comenzó');
+		$this->players[] = $player;
+	}
+
+	private function getPlayer($id) {
+		foreach($this->players as $player_actual)
+			if($player_actual->getId() == $id)
+				return $player_actual;
+	}
+
+	private function validaGanador() {
+		if(array_sum(array_column($this->players,'score')) == $this->players[0]->score)
+			$this->status = 3;
 	}
 }
 

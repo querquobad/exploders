@@ -21,11 +21,11 @@ class ExploderCell extends ExploderObject implements JsonSerializable {
 		$this->mapa = $mapa;
 	}
 
-	public function getBall($jugador) {
+	public function getBall(ExploderPlayer $jugador) {
 		$retval = array();
 		if(!is_null($this->jugador) && $jugador != $this->jugador) {
-			$retval[$this->jugador] = ($this->contenido * -1);
-			$retval[$jugador] = $this->contenido;
+			$retval[$this->jugador->getId()] = ($this->contenido * -1);
+			$retval[$jugador->getId()] = $this->contenido;
 		}
 		$this->contenido++;
 		$this->jugador = $jugador;
