@@ -46,6 +46,8 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 	}
 
 	public function pushBall($id, ExploderPlayer $jugador) {
+		if($this->status != 2)
+			throw new WrongGameStatusException('El juego no ha iniciado');
 		if($jugador != $this->players[0])
 			throw new WrongExploderPlayerException('El turno le pertenece al jugador '.$this->players[0]->getId());
 		$cuarto = $this->recursive_room_search($id);
@@ -110,6 +112,18 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 	private function validaGanador() {
 		if(array_sum(array_column($this->players,'score')) == $this->players[0]->score)
 			$this->status = 3;
+	}
+
+	public function startGame() {
+		if($this->status == 2)
+			throw new WrongGameStatusException('El juego ya comenzó');
+		if(count($this->players) < 2)
+			throw new RuntimeException('No se puede iniciar con menos de dos jugadores');
+		$this->status = 2;
+		return array(
+			'status' => $this->status,
+			'scores' => array_column($this->players,'score','id')
+		);
 	}
 }
 
