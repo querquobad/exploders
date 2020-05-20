@@ -69,6 +69,10 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 		}
 		return array(
 			'status' => $this->status,
+			'play' => array(
+				'player' => $jugador,
+				'cell' => $id
+			),
 			'exploders' => $retval,
 			'scores' => $this->cuenta
 		);
