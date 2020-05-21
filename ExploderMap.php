@@ -5,7 +5,7 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 	private $exploders;
 	private $cuenta = array();
 
-	public function __construct($ancho,$alto) {
+	public function __construct(int $ancho,int $alto) {
 		parent::__construct();
 		$this->exploders = new SplQueue();
 		foreach(array('crear','conectar') as $accion) {
