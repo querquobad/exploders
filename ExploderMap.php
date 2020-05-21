@@ -47,7 +47,7 @@ class ExploderMap extends ExploderObject implements JsonSerializable {
 
 	public function pushBall($id, ExploderPlayer $jugador) {
 		if($this->status != 2)
-			throw new WrongGameStatusException('El juego no ha iniciado');
+			throw new WrongGameStatusException('El juego no está iniciado');
 		if($jugador != $this->players[0])
 			throw new WrongExploderPlayerException('El turno le pertenece al jugador '.$this->players[0]->getId());
 		$cuarto = $this->recursive_room_search($id);
