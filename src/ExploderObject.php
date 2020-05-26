@@ -1,4 +1,5 @@
 <?php
+namespace ExploderCells;
 
 class ExploderObject {
 	private $id;

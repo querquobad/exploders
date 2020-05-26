@@ -1,4 +1,5 @@
 <?php
+namespace ExploderCells;
 
 class ExploderCell extends ExploderObject implements JsonSerializable {
 	private $contenido;

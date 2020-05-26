@@ -1,6 +1,9 @@
 <?php
+namespace ExploderCells;
 
-class ExploderPlayer extends ExploderObject {
+use Ratchet\ConnectionInterface;
+
+class ExploderPlayer extends ExploderObject implements ConnectionInterface{
 	private $nombre;
 	private $score;
 

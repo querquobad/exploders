@@ -1,4 +1,5 @@
 <?php
+namespace ExploderCells;
 
 class ExploderMap extends ExploderObject implements JsonSerializable {
 	private $cuartos = array();
